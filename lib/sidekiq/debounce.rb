@@ -10,7 +10,7 @@ module Sidekiq
       return yield unless debounce?
 
       block = Proc.new do |conn|
-        # Get JID of the already-scheduled job, if there is one
+        sleep sleep_time
         scheduled_jid = conn.get(debounce_key)
 
         # Reschedule the old job to when this new job is scheduled for
@@ -50,6 +50,10 @@ module Sidekiq
       job = scheduled_set.find_job(jid)
       job.reschedule(at) unless job.nil?
       jid
+    end
+
+    def sleep_time
+      Random.new.rand 2.0
     end
 
     def debounce?
